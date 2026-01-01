@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rayfield Framework IDE - Professional Web IDE for Roblox GUI Development</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-primary: #7c3aed;
+            --color-primary-light: #a78bfa;
+            --color-primary-dark: #5b21b6;
+            --color-secondary: #06b6d4;
+            --color-success: #10b981;
+            --color-warning: #f59e0b;
+            --color-danger: #ef4444;
+            --color-bg-dark: #0f172a;
+            --color-bg-darker: #0a0e27;
+            --color-bg-light: #1e293b;
+            --color-text-primary: #f1f5f9;
+            --color-text-secondary: #cbd5e1;
+            --color-border: #334155;
+            --color-editor-bg: #1e293b;
+            --color-editor-text: #e2e8f0;
+            --color-line-number: #64748b;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--color-bg-darker);
+            color: var(--color-text-primary);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-bottom: 1px solid var(--color-border);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-md);
+            z-index: 1000;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--color-primary-dark);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: var(--color-bg-light);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--color-bg-dark);
+            border-color: var(--color-primary);
+        }
+
+        .btn-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.375rem;
+        }
+
+        /* Main Container */
+        .container {
+            display: flex;
+            height: calc(100vh - 60px);
+            background-color: var(--color-bg-darker);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--color-bg-dark);
+            border-right: 1px solid var(--color-border);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-section {
+            border-bottom: 1px solid var(--color-border);
+            padding: 1rem;
+        }
+
+        .sidebar-section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--color-text-secondary);
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        .sidebar-item {
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 0.25rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--color-text-secondary);
+        }
+
+        .sidebar-item:hover {
+            background-color: var(--color-bg-light);
+            color: var(--color-text-primary);
+        }
+
+        .sidebar-item.active {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Editor Panel */
+        .editor-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--color-bg-darker);
+            border-right: 1px solid var(--color-border);
+        }
+
+        .editor-tabs {
+            display: flex;
+            background-color: var(--color-bg-dark);
+            border-bottom: 1px solid var(--color-border);
+            overflow-x: auto;
+            padding: 0.5rem;
+            gap: 0.25rem;
+        }
+
+        .editor-tab {
+            padding: 0.5rem 1rem;
+            background-color: var(--color-bg-light);
+            border: 1px solid var(--color-border);
+            border-radius: 0.375rem 0.375rem 0 0;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--color-text-secondary);
+            white-space: nowrap;
+        }
+
+        .editor-tab:hover {
+            background-color: var(--color-bg-darker);
+            color: var(--color-text-primary);
+        }
+
+        .editor-tab.active {
+            background-color: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
+        .editor-tab-close {
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+
+        .editor-tab-close:hover {
+            opacity: 1;
+        }
+
+        /* Code Editor */
+        .editor-wrapper {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .line-numbers {
+            background-color: var(--color-editor-bg);
+            color: var(--color-line-number);
+            padding: 1rem 1rem;
+            text-align: right;
+            overflow: hidden;
+            border-right: 1px solid var(--color-border);
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            user-select: none;
+        }
+
+        .code-editor {
+            flex: 1;
+            background-color: var(--color-editor-bg);
+            color: var(--color-editor-text);
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            padding: 1rem;
+            overflow: auto;
+            resize: none;
+            border: none;
+        }
+
+        .code-editor:focus {
+            outline: none;
+            background-color: var(--color-editor-bg);
+        }
+
+        /* Right Panel */
+        .right-panel {
+            width: 400px;
+            background-color: var(--color-bg-dark);
+            border-left: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--color-border);
+            background-color: var(--color-bg-light);
+        }
+
+        .panel-tab {
+            flex: 1;
+            padding: 0.75rem;
+            background-color: transparent;
+            border: none;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-bottom: 2px solid transparent;
+        }
+
+        .panel-tab:hover {
+            color: var(--color-text-primary);
+        }
+
+        .panel-tab.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        /* Preview Panel */
+        .preview-panel {
+            flex: 1;
+            background-color: var(--color-bg-dark);
+            border-left: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .preview-container {
+            flex: 1;
+            background-color: var(--color-bg-darker);
+            overflow: auto;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .preview-frame {
+            background-color: var(--color-bg-light);
+            border: 1px solid var(--color-border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            max-width: 100%;
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Widget Inspector */
+        .widget-inspector {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .widget-item {
+            background-color: var(--color-bg-light);
+            border: 1px solid var(--color-border);
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+            cursor: move;
+            transition: all 0.2s ease;
+        }
+
+        .widget-item:hover {
+            background-color: var(--color-bg-darker);
+            border-color: var(--color-primary);
+        }
+
+        .widget-item.selected {
+            border-color: var(--color-primary);
+            background-color: rgba(124, 58, 237, 0.1);
+        }
+
+        .widget-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            color: var(--color-text-primary);
+        }
+
+        .widget-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .widget-controls button {
+            flex: 1;
+            padding: 0.375rem 0.5rem;
+            font-size: 0.75rem;
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .widget-controls button:hover {
+            background-color: var(--color-primary-dark);
+        }
+
+        /* Properties Panel */
+        .property-group {
+            margin-bottom: 1rem;
+        }
+
+        .property-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--color-text-secondary);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .property-input {
+            width: 100%;
+            padding: 0.5rem;
+            background-color: var(--color-bg-darker);
+            border: 1px solid var(--color-border);
+            border-radius: 0.375rem;
+            color: var(--color-editor-text);
+            font-size: 0.875rem;
+            font-family: monospace;
+            transition: all 0.2s ease;
+        }
+
+        .property-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            background-color: var(--color-editor-bg);
+        }
+
+        /* Color Picker */
+        .color-picker-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .color-picker-input {
+            width: 3rem;
+            height: 2rem;
+            border: 1px solid var(--color-border);
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .color-picker-input:hover {
+            border-color: var(--color-primary);
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            background-color: var(--color-bg-light);
+            border-bottom: 1px solid var(--color-border);
+            flex-wrap: wrap;
+        }
+
+        .toolbar-group {
+            display: flex;
+            gap: 0.5rem;
+            border-right: 1px solid var(--color-border);
+            padding-right: 1rem;
+        }
+
+        .toolbar-group:last-child {
+            border-right: none;
+            padding-right: 0;
+        }
+
+        .toolbar-btn {
+            width: 2rem;
+            height: 2rem;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--color-bg-darker);
+            border: 1px solid var(--color-border);
+            border-radius: 0.375rem;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .toolbar-btn:hover {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+            color: white;
+        }
+
+        .toolbar-btn.active {
+            background-color: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
+        /* Documentation Panel */
+        .doc-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .doc-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .doc-content {
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: var(--color-text-secondary);
+        }
+
+        .code-snippet {
+            background-color: var(--color-bg-darker);
+            border-left: 2px solid var(--color-primary);
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+            font-size: 0.75rem;
+            overflow-x: auto;
+            color: var(--color-editor-text);
+        }
+
+        /* Theme Selector */
+        .theme-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .theme-option {
+            padding: 0.75rem;
+            border: 2px solid var(--color-border);
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            font-size: 0.875rem;
+        }
+
+        .theme-option:hover {
+            border-color: var(--color-primary);
+        }
+
+        .theme-option.active {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+            color: white;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--color-bg-light);
+            border-radius: 0.5rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--color-text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .modal-body {
+            margin-bottom: 1.5rem;
+            color: var(--color-text-secondary);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1600px) {
+            .right-panel {
+                width: 350px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .right-panel {
+                width: 300px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: 50px;
+                flex-direction: row;
+                overflow-x: auto;
+            }
+
+            .main-content {
+                flex-direction: column;
+            }
+
+            .editor-panel {
+                flex: 1;
+                width: 100%;
+            }
+
+            .right-panel,
+            .preview-panel {
+                display: none;
+            }
+
+            .right-panel.mobile-visible,
+            .preview-panel.mobile-visible {
+                display: flex;
+                width: 100%;
+                height: 300px;
+                border-left: none;
+                border-top: 1px solid var(--color-border);
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--color-bg-darker);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--color-primary);
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            padding: 1rem 1.5rem;
+            background-color: var(--color-success);
+            color: white;
+            border-radius: 0.375rem;
+            box-shadow: var(--shadow-lg);
+            animation: slideIn 0.3s ease;
+            z-index: 3000;
+        }
+
+        .notification.error {
+            background-color: var(--color-danger);
+        }
+
+        .notification.warning {
+            background-color: var(--color-warning);
+        }
+
+        .notification.info {
+            background-color: var(--color-secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <span class="logo-icon">🎨</span>
+                <span>Rayfield IDE</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-secondary" id="btn-settings" title="Settings">⚙️</button>
+            <button class="btn btn-secondary" id="btn-docs" title="Documentation">📚</button>
+            <button class="btn btn-primary" id="btn-export">📥 Export Code</button>
+            <button class="btn btn-primary" id="btn-run">▶️ Run</button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Projects</div>
+                <div class="sidebar-item active" data-action="new-project">
+                    <span>➕</span> New Project
+                </div>
+                <div class="sidebar-item" data-action="open-project">
+                    <span>📂</span> Open Project
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Templates</div>
+                <div class="sidebar-item" data-template="blank">
+                    <span>📄</span> Blank Project
+                </div>
+                <div class="sidebar-item" data-template="window">
+                    <span>🪟</span> Window UI
+                </div>
+                <div class="sidebar-item" data-template="dashboard">
+                    <span>📊</span> Dashboard
+                </div>
+                <div class="sidebar-item" data-template="settings">
+                    <span>⚙️</span> Settings Panel
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Widgets</div>
+                <div class="sidebar-item" data-widget="window">
+                    <span>🪟</span> Window
+                </div>
+                <div class="sidebar-item" data-widget="label">
+                    <span>📝</span> Label
+                </div>
+                <div class="sidebar-item" data-widget="button">
+                    <span>🔘</span> Button
+                </div>
+                <div class="sidebar-item" data-widget="textbox">
+                    <span>✏️</span> TextBox
+                </div>
+                <div class="sidebar-item" data-widget="slider">
+                    <span>🎚️</span> Slider
+                </div>
+                <div class="sidebar-item" data-widget="toggle">
+                    <span>🔲</span> Toggle
+                </div>
+                <div class="sidebar-item" data-widget="dropdown">
+                    <span>📋</span> Dropdown
+                </div>
+                <div class="sidebar-item" data-widget="section">
+                    <span>📦</span> Section
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Help</div>
+                <div class="sidebar-item" data-action="help">
+                    <span>❓</span> Get Help
+                </div>
+                <div class="sidebar-item" data-action="about">
+                    <span>ℹ️</span> About
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Editor Panel -->
+            <div class="editor-panel">
+                <div class="toolbar">
+                    <div class="toolbar-group">
+                        <button class="toolbar-btn" title="New File" id="btn-new-file">📄</button>
+                        <button class="toolbar-btn" title="Save" id="btn-save">💾</button>
+                        <button class="toolbar-btn" title="Undo" id="btn-undo">↶</button>
+                        <button class="toolbar-btn" title="Redo" id="btn-redo">↷</button>
+                    </div>
+                    <div class="toolbar-group">
+                        <button class="toolbar-btn" title="Format Code" id="btn-format">✨</button>
+                        <button class="toolbar-btn" title="Find & Replace" id="btn-find">🔍</button>
+                        <button class="toolbar-btn" title="Minimap" id="btn-minimap">🗺️</button>
+                    </div>
+                    <div class="toolbar-group">
+                        <button class="toolbar-btn" title="Split View" id="btn-split">⊞</button>
+                        <button class="toolbar-btn" title="Zen Mode" id="btn-zen">🌙</button>
+                    </div>
+                </div>
+
+                <div class="editor-tabs" id="editor-tabs">
+                    <div class="editor-tab active" data-tab="main">
+                        <span>📝</span> main.lua
+                        <span class="editor-tab-close">✕</span>
+                    </div>
+                </div>
+
+                <div class="editor-wrapper">
+                    <div class="line-numbers" id="line-numbers"></div>
+                    <textarea class="code-editor" id="code-editor" spellcheck="false"></textarea>
+                </div>
+            </div>
+
+            <!-- Right Panel -->
+            <div class="right-panel" id="right-panel">
+                <div class="panel-tabs">
+                    <button class="panel-tab active" data-panel="properties">Properties</button>
+                    <button class="panel-tab" data-panel="preview">Preview</button>
+                    <button class="panel-tab" data-panel="docs">Docs</button>
+                </div>
+
+                <!-- Properties Panel -->
+                <div class="panel-content" id="properties-panel" style="display: block;">
+                    <div class="widget-inspector" id="widget-list">
+                        <div style="text-align: center; color: var(--color-text-secondary); padding: 2rem;">
+                            <p>Select a widget to edit its properties</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview Panel -->
+                <div class="panel-content" id="preview-panel" style="display: none;">
+                    <div class="preview-container">
+                        <div class="preview-frame" id="preview-content">
+                            <div style="text-align: center; color: var(--color-text-secondary);">
+                                <p>📊 Live Preview</p>
+                                <p style="font-size: 0.75rem; margin-top: 0.5rem;">Run your code to see the preview</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documentation Panel -->
+                <div class="panel-content" id="docs-panel" style="display: none;">
+                    <div class="doc-section">
+                        <div class="doc-title">Welcome to Rayfield IDE</div>
+                        <div class="doc-content">
+                            <p>This is a comprehensive Web IDE for building beautiful GUIs with the Roblox Rayfield Framework.</p>
+                        </div>
+                    </div>
+
+                    <div class="doc-section">
+                        <div class="doc-title">Creating Your First Window</div>
+                        <div class="doc-content">
+                            <p>To create a window, use the Window widget from the sidebar and configure its properties.</p>
+                            <div class="code-snippet">local Window = Rayfield:CreateWindow({
+   Name = "My Window",
+   Icon = 0,
+   LoadingTitle = "Loading...",
+   LoadingSubtitle = "by VampProject"
+})</div>
+                        </div>
+                    </div>
+
+                    <div class="doc-section">
+                        <div class="doc-title">Adding Widgets</div>
+                        <div class="doc-content">
+                            <p>Drag widgets from the sidebar to add them to your window. Customize properties on the left panel.</p>
+                        </div>
+                    </div>
+
+                    <div class="doc-section">
+                        <div class="doc-title">Keyboard Shortcuts</div>
+                        <div class="doc-content">
+                            <ul style="margin-left: 1rem;">
+                                <li>Ctrl+S: Save</li>
+                                <li>Ctrl+Z: Undo</li>
+                                <li>Ctrl+Y: Redo</li>
+                                <li>Ctrl+F: Find</li>
+                                <li>Ctrl+Shift+F: Format</li>
+                                <li>Ctrl+Enter: Run</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="doc-section">
+                        <div class="doc-title">Resources</div>
+                        <div class="doc-content">
+                            <p>Learn more about Rayfield:</p>
+                            <ul style="margin-left: 1rem;">
+                                <li><a href="https://github.com/shlexware/Rayfield" target="_blank" style="color: var(--color-primary);">GitHub Repository</a></li>
+                                <li><a href="https://roblox.com" target="_blank" style="color: var(--color-primary);">Roblox Developer Hub</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Panel (Right Side) -->
+            <div class="preview-panel">
+                <div class="editor-tabs" style="justify-content: space-between;">
+                    <span style="padding: 0.75rem 1rem; font-weight: 500;">📊 Visual Preview</span>
+                    <button class="toolbar-btn" style="margin: 0.375rem 0.5rem 0; width: auto; padding: 0 0.75rem;" id="btn-refresh-preview">🔄 Refresh</button>
+                </div>
+                <div class="preview-container">
+                    <div class="preview-frame" id="visual-preview">
+                        <div style="text-align: center; padding: 2rem; color: var(--color-text-secondary);">
+                            <p style="font-size: 1.25rem; margin-bottom: 1rem;">🎨 Visual Builder</p>
+                            <p>Drag widgets here to build your interface visually</p>
+                            <div style="margin-top: 1.5rem; font-size: 0.75rem;">
+                                <p>💡 Tip: Widgets from the sidebar can be dragged here</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-title">⚙️ Settings</div>
+            <div class="modal-body">
+                <div class="property-group">
+                    <label class="property-label">Theme</label>
+                    <div class="theme-selector">
+                        <div class="theme-option active" data-theme="dark">🌙 Dark</div>
+                        <div class="theme-option" data-theme="light">☀️ Light</div>
+                        <div class="theme-option" data-theme="custom">🎨 Custom</div>
+                        <div class="theme-option" data-theme="system">🖥️ System</div>
+                    </div>
+                </div>
+
+                <div class="property-group">
+                    <label class="property-label">Font Size</label>
+                    <input type="range" class="property-input" id="font-size-slider" min="12" max="20" value="14" style="padding: 0.5rem;">
+                </div>
+
+                <div class="property-group">
+                    <label class="property-label">Auto-Save Interval</label>
+                    <input type="number" class="property-input" id="auto-save-interval" value="60" placeholder="Seconds">
+                </div>
+
+                <div class="property-group">
+                    <label class="property-label">Editor Options</label>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--color-text-secondary); cursor: pointer;">
+                            <input type="checkbox" id="enable-minimap" checked>
+                            <span>Show Minimap</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--color-text-secondary); cursor: pointer;">
+                            <input type="checkbox" id="enable-autocomplete" checked>
+                            <span>Enable Autocomplete</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--color-text-secondary); cursor: pointer;">
+                            <input type="checkbox" id="enable-linenumbers" checked>
+                            <span>Show Line Numbers</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; color: var(--color-text-secondary); cursor: pointer;">
+                            <input type="checkbox" id="enable-wordwrap" checked>
+                            <span>Word Wrap</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btn-settings-close">Cancel</button>
+                <button class="btn btn-primary" id="btn-settings-save">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Modal -->
+    <div class="modal" id="help-modal">
+        <div class="modal-content">
+            <div class="modal-title">❓ Getting Started</div>
+            <div class="modal-body">
+                <h3 style="color: var(--color-primary); margin-top: 1rem; margin-bottom: 0.5rem;">Quick Start Guide</h3>
+                <ol style="margin-left: 1.5rem; color: var(--color-text-secondary); line-height: 1.8;">
+                    <li>Create a new project or choose a template</li>
+                    <li>Drag widgets from the sidebar to the visual builder</li>
+                    <li>Customize properties in the right panel</li>
+                    <li>Write code in the editor</li>
+                    <li>Click Run to test your GUI</li>
+                    <li>Export your code when ready</li>
+                </ol>
+
+                <h3 style="color: var(--color-primary); margin-top: 1rem; margin-bottom: 0.5rem;">Shortcuts</h3>
+                <table style="width: 100%; font-size: 0.875rem; color: var(--color-text-secondary);">
+                    <tr><td>Ctrl+S</td><td style="text-align: right;">Save</td></tr>
+                    <tr><td>Ctrl+Z</td><td style="text-align: right;">Undo</td></tr>
+                    <tr><td>Ctrl+F</td><td style="text-align: right;">Find</td></tr>
+                    <tr><td>Ctrl+Enter</td><td style="text-align: right;">Run Code</td></tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="btn-help-close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div class="modal" id="about-modal">
+        <div class="modal-content">
+            <div class="modal-title">ℹ️ About Rayfield IDE</div>
+            <div class="modal-body">
+                <p style="color: var(--color-text-secondary); line-height: 1.8;">
+                    <strong>Rayfield IDE v1.0</strong> is a professional Web IDE for developing beautiful GUIs with the Roblox Rayfield Framework.
+                </p>
+
+                <h4 style="color: var(--color-primary); margin-top: 1rem; margin-bottom: 0.5rem;">Features</h4>
+                <ul style="margin-left: 1.5rem; color: var(--color-text-secondary); line-height: 1.8;">
+                    <li>✨ Modern, responsive code editor</li>
+                    <li>🎨 Visual widget builder</li>
+                    <li>📊 Live preview system</li>
+                    <li>🎯 Real-time code generation</li>
+                    <li>📚 Integrated documentation</li>
+                    <li>🌙 Dark/Light theme support</li>
+                    <li>💾 Auto-save functionality</li>
+                </ul>
+
+                <h4 style="color: var(--color-primary); margin-top: 1rem; margin-bottom: 0.5rem;">Made with ❤️ by VampProject</h4>
+                <p style="color: var(--color-text-secondary); font-size: 0.875rem;">
+                    Rayfield Framework © Shlexware
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="btn-about-close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // IDE State Management
+        const IDEState = {
+            currentProject: 'Untitled Project',
+            currentFile: 'main.lua',
+            isDirty: false,
+            theme: 'dark',
+            fontSize: 14,
+            autoSaveInterval: 60,
+            widgets: [],
+            selectedWidget: null,
+            history: {
+                undo: [],
+                redo: []
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeEditor();
+            setupEventListeners();
+            loadDefaultCode();
+            updateLineNumbers();
+            applySettings();
+        });
+
+        // Initialize Editor
+        function initializeEditor() {
+            const editor = document.getElementById('code-editor');
+            
+            // Update line numbers on input
+            editor.addEventListener('input', () => {
+                updateLineNumbers();
+                IDEState.isDirty = true;
+                updateTitle();
+            });
+
+            // Tab support in editor
+            editor.addEventListener('keydown', (e) => {
+                if (e.key === 'Tab') {
+                    e.preventDefault();
+                    const start = editor.selectionStart;
+                    const end = editor.selectionEnd;
+                    editor.value = editor.value.substring(0, start) + '\t' + editor.value.substring(end);
+                    editor.selectionStart = editor.selectionEnd = start + 1;
+                    updateLineNumbers();
+                }
+
+                // Keyboard shortcuts
+                if (e.ctrlKey || e.metaKey) {
+                    if (e.key === 's') {
+                        e.preventDefault();
+                        saveProject();
+                    } else if (e.key === 'z' && !e.shiftKey) {
+                        e.preventDefault();
+                        undo();
+                    } else if ((e.key === 'y') || (e.key === 'z' && e.shiftKey)) {
+                        e.preventDefault();
+                        redo();
+                    } else if (e.key === 'f') {
+                        e.preventDefault();
+                        toggleFindModal();
+                    } else if (e.key === 'Enter') {
+                        e.preventDefault();
+                        runCode();
+                    }
+                }
+
+                if (e.shiftKey && e.ctrlKey && e.key === 'f') {
+                    e.preventDefault();
+                    formatCode();
+                }
+            });
+        }
+
+        // Update Line Numbers
+        function updateLineNumbers() {
+            const editor = document.getElementById('code-editor');
+            const lineNumbers = document.getElementById('line-numbers');
+            const lines = editor.value.split('\n').length;
+            
+            let html = '';
+            for (let i = 1; i <= lines; i++) {
+                html += i + '\n';
+            }
+            lineNumbers.textContent = html;
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Header buttons
+            document.getElementById('btn-settings').addEventListener('click', () => {
+                document.getElementById('settings-modal').classList.add('active');
+            });
+
+            document.getElementById('btn-docs').addEventListener('click', () => {
+                switchPanel('docs');
+            });
+
+            document.getElementById('btn-export').addEventListener('click', exportCode);
+            document.getElementById('btn-run').addEventListener('click', runCode);
+
+            // Toolbar buttons
+            document.getElementById('btn-new-file').addEventListener('click', newFile);
+            document.getElementById('btn-save').addEventListener('click', saveProject);
+            document.getElementById('btn-undo').addEventListener('click', undo);
+            document.getElementById('btn-redo').addEventListener('click', redo);
+            document.getElementById('btn-format').addEventListener('click', formatCode);
+            document.getElementById('btn-find').addEventListener('click', toggleFindModal);
+            document.getElementById('btn-refresh-preview').addEventListener('click', refreshPreview);
+
+            // Panel tabs
+            document.querySelectorAll('.panel-tab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    const panelName = e.target.dataset.panel;
+                    switchPanel(panelName);
+                });
+            });
+
+            // Sidebar items
+            document.querySelectorAll('[data-template]').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    loadTemplate(e.currentTarget.dataset.template);
+                });
+            });
+
+            document.querySelectorAll('[data-widget]').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    addWidget(e.currentTarget.dataset.widget);
+                });
+            });
+
+            document.querySelectorAll('[data-action]').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    handleAction(e.currentTarget.dataset.action);
+                });
+            });
+
+            // Settings modal
+            document.getElementById('btn-settings-close').addEventListener('click', () => {
+                document.getElementById('settings-modal').classList.remove('active');
+            });
+
+            document.getElementById('btn-settings-save').addEventListener('click', saveSettings);
+
+            // Theme options
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    document.querySelectorAll('.theme-option').forEach(o => o.classList.remove('active'));
+                    e.target.classList.add('active');
+                    applyTheme(e.target.dataset.theme);
+                });
+            });
+
+            // Help and About modals
+            document.getElementById('btn-help-close').addEventListener('click', () => {
+                document.getElementById('help-modal').classList.remove('active');
+            });
+
+            document.getElementById('btn-about-close').addEventListener('click', () => {
+                document.getElementById('about-modal').classList.remove('active');
+            });
+
+            // Editor tabs close
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('editor-tab-close')) {
+                    closeTab(e.target.closest('.editor-tab'));
+                }
+            });
+        }
+
+        // Panel Switching
+        function switchPanel(panelName) {
+            document.querySelectorAll('.panel-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.panel-content').forEach(content => content.style.display = 'none');
+
+            document.querySelector(`[data-panel="${panelName}"]`).classList.add('active');
+            document.getElementById(`${panelName}-panel`).style.display = 'block';
+        }
+
+        // Load Default Code
+        function loadDefaultCode() {
+            const defaultCode = `-- Rayfield Framework Window Template
+-- Created with Rayfield IDE
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "My Amazing GUI",
+    Icon = 0,
+    LoadingTitle = "Loading...",
+    LoadingSubtitle = "by VampProject",
+    Theme = "Dark"
+})
+
+local Tab = Window:CreateTab("Home", 4483362458)
+
+local Section = Tab:CreateSection("Getting Started")
+
+Tab:CreateLabel("Welcome to Rayfield Framework!")
+
+Tab:CreateButton({
+    Name = "Click Me!",
+    Callback = function()
+        print("Button clicked!")
+    end,
+})
+
+Tab:CreateToggle({
+    Name = "Enable Feature",
+    CurrentValue = false,
+    Flag = "Toggle1",
+    Callback = function(Value)
+        print("Toggle:", Value)
+    end,
+})
+
+Tab:CreateSlider({
+    Name = "Volume",
+    Range = {0, 100},
+    Increment = 5,
+    Suffix = "%",
+    CurrentValue = 50,
+    Flag = "Slider1",
+    Callback = function(Value)
+        print("Slider:", Value)
+    end,
+})
+
+Window:MakeNotification({
+    Title = "Welcome!",
+    Content = "You've successfully loaded Rayfield IDE",
+    Duration = 5,
+    Image = 4483362458
+});`;
+
+            document.getElementById('code-editor').value = defaultCode;
+            updateLineNumbers();
+        }
+
+        // Add Widget to Visual Builder
+        function addWidget(widgetType) {
+            const widget = {
+                id: Date.now(),
+                type: widgetType,
+                name: `${widgetType.charAt(0).toUpperCase() + widgetType.slice(1)}_${Math.random().toString(36).substr(2, 9)}`,
+                properties: {
+                    label: widgetType,
+                    color: '#7c3aed',
+                    size: 'medium'
+                }
+            };
+
+            IDEState.widgets.push(widget);
+            renderWidgetList();
+            showNotification(`Added ${widgetType}`, 'success');
+        }
+
+        // Render Widget List
+        function renderWidgetList() {
+            const list = document.getElementById('widget-list');
+            
+            if (IDEState.widgets.length === 0) {
+                list.innerHTML = '<div style="text-align: center; color: var(--color-text-secondary); padding: 2rem;"><p>No widgets added yet</p></div>';
+                return;
+            }
+
+            list.innerHTML = IDEState.widgets.map(widget => `
+                <div class="widget-item ${IDEState.selectedWidget?.id === widget.id ? 'selected' : ''}" data-widget-id="${widget.id}">
+                    <div class="widget-name">${widget.name}</div>
+                    <div class="widget-controls">
+                        <button onclick="selectWidget(${widget.id})">Edit</button>
+                        <button onclick="deleteWidget(${widget.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+
+            document.querySelectorAll('[data-widget-id]').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    selectWidget(parseInt(e.currentTarget.dataset.widgetId));
+                });
+            });
+        }
+
+        // Select Widget
+        function selectWidget(widgetId) {
+            IDEState.selectedWidget = IDEState.widgets.find(w => w.id === widgetId);
+            renderWidgetList();
+            renderProperties();
+        }
+
+        // Delete Widget
+        function deleteWidget(widgetId) {
+            IDEState.widgets = IDEState.widgets.filter(w => w.id !== widgetId);
+            if (IDEState.selectedWidget?.id === widgetId) {
+                IDEState.selectedWidget = null;
+            }
+            renderWidgetList();
+            showNotification('Widget deleted', 'success');
+        }
+
+        // Render Properties
+        function renderProperties() {
+            const panel = document.getElementById('properties-panel');
+            
+            if (!IDEState.selectedWidget) {
+                panel.innerHTML = '<div style="text-align: center; color: var(--color-text-secondary); padding: 2rem;"><p>Select a widget to edit its properties</p></div>';
+                return;
+            }
+
+            const props = IDEState.selectedWidget.properties;
+            
+            panel.innerHTML = `
+                <div class="property-group">
+                    <label class="property-label">Name</label>
+                    <input type="text" class="property-input" value="${IDEState.selectedWidget.name}" onchange="updateWidgetProperty('name', this.value)">
+                </div>
+
+                <div class="property-group">
+                    <label class="property-label">Label</label>
+                    <input type="text" class="property-input" value="${props.label}" onchange="updateWidgetProperty('label', this.value)">
+                </div>
+
+                <div class="property-group">
+                    <label class="property-label">Color</label>
+                    <div class="color-picker-wrapper">
+                        <input type="color" class="color-picker-input" value="${props.color}" onchange="updateWidgetProperty('color', this.value)">
+                        <input type="text" class="property-input" value="${props.color}" onchange="updateWidgetProperty('color', this.value)" style="flex: 1;">
+                    </div>
+                </div>
+
+                <div class="property-group">
+                    <label class="property-label">Size</label>
+                    <select class="property-input" onchange="updateWidgetProperty('size', this.value)">
+                        <option value="small" ${props.size === 'small' ? 'selected' : ''}>Small</option>
+                        <option value="medium" ${props.size === 'medium' ? 'selected' : ''}>Medium</option>
+                        <option value="large" ${props.size === 'large' ? 'selected' : ''}>Large</option>
+                    </select>
+                </div>
+
+                <div class="property-group">
+                    <label class="property-label">Type</label>
+                    <input type="text" class="property-input" value="${IDEState.selectedWidget.type}" disabled>
+                </div>
+
+                <div class="property-group">
+                    <label class="property-label">Code Snippet</label>
+                    <div class="code-snippet">local ${IDEState.selectedWidget.name} = Tab:Create${IDEState.selectedWidget.type.charAt(0).toUpperCase() + IDEState.selectedWidget.type.slice(1)}({
+    Name = "${props.label}",
+})</div>
+                </div>
+            `;
+        }
+
+        // Update Widget Property
+        function updateWidgetProperty(key, value) {
+            if (!IDEState.selectedWidget) return;
+            
+            if (key === 'name') {
+                IDEState.selectedWidget.name = value;
+            } else {
+                IDEState.selectedWidget.properties[key] = value;
+            }
+            
+            renderWidgetList();
+            renderProperties();
+        }
+
+        // Load Template
+        function loadTemplate(templateName) {
+            const templates = {
+                blank: '-- New Blank Project\n-- Start coding here!\n',
+                window: loadDefaultCode(),
+                dashboard: `-- Dashboard Template\nlocal Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()\n\nlocal Window = Rayfield:CreateWindow({\n    Name = "Dashboard",\n    Theme = "Dark"\n})\n\nlocal Tab = Window:CreateTab("Stats", 4483362458)\nTab:CreateLabel("Your Stats Here")\n`,
+                settings: `-- Settings Panel Template\nlocal Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()\n\nlocal Window = Rayfield:CreateWindow({\n    Name = "Settings",\n    Theme = "Dark"\n})\n\nlocal Tab = Window:CreateTab("Settings", 4483362458)\nTab:CreateToggle({ Name = "Setting 1" })\n`
+            };
+
+            const code = templates[templateName] || templates.blank;
+            const editor = document.getElementById('code-editor');
+            
+            addToHistory(editor.value);
+            editor.value = code;
+            updateLineNumbers();
+            showNotification(`Loaded ${templateName} template`, 'success');
+        }
+
+        // Handle Actions
+        function handleAction(action) {
+            switch(action) {
+                case 'new-project':
+                    if (confirm('Create a new project? Unsaved changes will be lost.')) {
+                        IDEState.currentProject = prompt('Project name:', 'Untitled Project');
+                        IDEState.widgets = [];
+                        IDEState.selectedWidget = null;
+                        document.getElementById('code-editor').value = '';
+                        updateLineNumbers();
+                        updateTitle();
+                        renderWidgetList();
+                    }
+                    break;
+                case 'help':
+                    document.getElementById('help-modal').classList.add('active');
+                    break;
+                case 'about':
+                    document.getElementById('about-modal').classList.add('active');
+                    break;
+            }
+        }
+
+        // Save Project
+        function saveProject() {
+            const code = document.getElementById('code-editor').value;
+            localStorage.setItem(`rayfield_project_${IDEState.currentProject}`, code);
+            localStorage.setItem(`rayfield_widgets_${IDEState.currentProject}`, JSON.stringify(IDEState.widgets));
+            IDEState.isDirty = false;
+            updateTitle();
+            showNotification('Project saved!', 'success');
+        }
+
+        // Export Code
+        function exportCode() {
+            const code = document.getElementById('code-editor').value;
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(code));
+            element.setAttribute('download', `${IDEState.currentProject}.lua`);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+            showNotification('Code exported!', 'success');
+        }
+
+        // Run Code
+        function runCode() {
+            showNotification('Running code... (In Roblox)', 'info');
+            // In a real scenario, this would execute the Lua code in Roblox
+        }
+
+        // New File
+        function newFile() {
+            const fileName = prompt('File name:', 'untitled.lua');
+            if (fileName) {
+                const tab = document.createElement('div');
+                tab.className = 'editor-tab';
+                tab.innerHTML = `<span>📝</span> ${fileName}<span class="editor-tab-close">✕</span>`;
+                document.getElementById('editor-tabs').appendChild(tab);
+                showNotification(`Created ${fileName}`, 'success');
+            }
+        }
+
+        // Close Tab
+        function closeTab(tab) {
+            if (document.querySelectorAll('.editor-tab').length > 1) {
+                tab.remove();
+                showNotification('Tab closed', 'success');
+            } else {
+                showNotification('Cannot close the last tab', 'warning');
+            }
+        }
+
+        // Format Code
+        function formatCode() {
+            const editor = document.getElementById('code-editor');
+            // Simple formatting (in production, use a proper Lua formatter)
+            const code = editor.value;
+            editor.value = code; // Placeholder
+            showNotification('Code formatted', 'success');
+        }
+
+        // Undo/Redo
+        function addToHistory(content) {
+            IDEState.history.undo.push(content);
+            IDEState.history.redo = [];
+        }
+
+        function undo() {
+            if (IDEState.history.undo.length === 0) return;
+            const editor = document.getElementById('code-editor');
+            IDEState.history.redo.push(editor.value);
+            editor.value = IDEState.history.undo.pop();
+            updateLineNumbers();
+            showNotification('Undo', 'info');
+        }
+
+        function redo() {
+            if (IDEState.history.redo.length === 0) return;
+            const editor = document.getElementById('code-editor');
+            IDEState.history.undo.push(editor.value);
+            editor.value = IDEState.history.redo.pop();
+            updateLineNumbers();
+            showNotification('Redo', 'info');
+        }
+
+        // Toggle Find Modal
+        function toggleFindModal() {
+            showNotification('Find feature coming soon', 'info');
+        }
+
+        // Refresh Preview
+        function refreshPreview() {
+            showNotification('Preview refreshed', 'success');
+        }
+
+        // Settings
+        function saveSettings() {
+            const fontSize = document.getElementById('font-size-slider').value;
+            const autoSaveInterval = document.getElementById('auto-save-interval').value;
+            
+            IDEState.fontSize = fontSize;
+            IDEState.autoSaveInterval = autoSaveInterval;
+            
+            document.getElementById('code-editor').style.fontSize = `${fontSize}px`;
+            
+            document.getElementById('settings-modal').classList.remove('active');
+            showNotification('Settings saved', 'success');
+        }
+
+        function applySettings() {
+            document.getElementById('code-editor').style.fontSize = `${IDEState.fontSize}px`;
+        }
+
+        // Theme Management
+        function applyTheme(theme) {
+            IDEState.theme = theme;
+            // In a full implementation, this would switch CSS variables
+            showNotification(`Theme changed to ${theme}`, 'info');
+        }
+
+        // Update Title
+        function updateTitle() {
+            const title = IDEState.isDirty ? `● ${IDEState.currentProject}` : IDEState.currentProject;
+            document.title = `${title} - Rayfield IDE`;
+        }
+
+        // Notification System
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Update title on page load
+        updateTitle();
+    </script>
+</body>
+</html>
